@@ -8,7 +8,7 @@ typedef struct {
 } eFecha;
 
 typedef struct {
-	int id; // si agrego una venta nueva, comienza en 101 el id.
+	int id;
 	eFecha fecha;
 	char modelo[50];
 	int cantidad;
