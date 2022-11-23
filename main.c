@@ -21,21 +21,21 @@ int main(void) {
 		MENSAJE_MENU, "Error. Opción inválida.\n", 1, 7) == 0) {
 			switch (opcion) {
 			case 1:
-				if (agregarVenta(listaVentas) == 0) {
+				if (controller_agregarVenta(listaVentas) == 0) {
 					printf("Se dio de alta la venta exitosamente\n");
 				} else {
 					printf("Error. No se pudo dar de alta la venta\n");
 				}
 				break;
 			case 2:
-				if (eliminarVenta(listaVentas) == 0) {
+				if (controller_eliminarVenta(listaVentas) == 0) {
 					printf("Se eliminó la venta exitosamente\n");
 				} else {
 					printf("No se pudo eliminar la venta\n");
 				}
 				break;
 			case 3:
-				modificarVenta(listaVentas);
+				controller_modificarVenta(listaVentas);
 				break;
 			case 4:
 				if (listarVentas(listaVentas) == -1) {
@@ -43,10 +43,15 @@ int main(void) {
 				}
 				break;
 			case 5:
-				guardarArchivoSubmenu(listaVentas);
+				guardarArchivoVentasSubmenu(listaVentas);
 				break;
 			case 6:
-				generarInformeVentas(listaVentas);
+				if (controller_generarInformeVentasFormatoTexto("informes.txt",
+						listaVentas) == 0) {
+					printf("Se generó exitosamente el informe de ventas\n");
+				} else {
+					printf("No se pudo generar el informe de ventas\n");
+				}
 				break;
 			case 7:
 				if (utn_obtenerNumero(&confirmacion,

@@ -24,6 +24,7 @@ typedef struct {
 	long int tarjetaCredito;
 } eVenta;
 
+eVenta* venta_new(void);
 eVenta* venta_newParametros(char *idStr, char *fechaStr, char *modeloStr,
 		char *cantidadStr, char *precioUnitarioStr, char *tarjetaCreditoStr);
 
@@ -47,11 +48,6 @@ int venta_setTarjetaCredito(eVenta *this, long int tarjetaCredito);
 int venta_getTarjetaCredito(eVenta *this, long int *pTarjetaCredito);
 
 int listarVentas(LinkedList *pListVentas);
-
-int agregarVenta(LinkedList *pListaVentas);
-int eliminarVenta(LinkedList *pListaVentas);
-void modificarVenta(LinkedList *pListaVentas);
-void guardarArchivoSubmenu(LinkedList *pListaVentas);
-void generarInformeVentas(LinkedList *pListaVentas);
+void guardarArchivoVentasSubmenu(LinkedList *pListaVentas);
 
 #endif /* VENTAS_H_ */
