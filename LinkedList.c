@@ -76,9 +76,10 @@ void* ll_get(LinkedList *this, int index) {
 	void *pRetorno = NULL;
 
 	if (this != NULL && index >= 0 && index < ll_len(this)) {
-		auxNode = getNode(this, index); //Validar.
-		pRetorno = auxNode->pElement;
-
+		auxNode = getNode(this, index);
+		if (auxNode != NULL) {
+			pRetorno = auxNode->pElement;
+		}
 	}
 	return pRetorno;
 }
@@ -121,4 +122,23 @@ int ll_remove(LinkedList *this, int index) {
 		retorno = 0;
 	}
 	return retorno;
+}
+
+int ll_count(LinkedList *this, int (fn)(void *element)) {
+	int contador = 0;
+	int largoLista;
+	void *pAuxElemento;
+
+	if (this != NULL && fn != NULL) {
+		largoLista = ll_len(this);
+		if (largoLista > 0) {
+			for (int i = 0; i < largoLista; i++) {
+				pAuxElemento = ll_get(this, i);
+				if (pAuxElemento != NULL) {
+					contador += fn(pAuxElemento);
+				}
+			}
+		}
+	}
+	return contador;
 }

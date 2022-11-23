@@ -476,6 +476,112 @@ void guardarArchivoSubmenu(LinkedList *pListaVentas) {
 			}
 		}
 	}
+}
 
+// Funciones criterio
+static int buscarCantidadesVendidas(void *this) {
+	eVenta *pVenta;
+	int cantidadVendida;
+	int retorno = 0;
+
+	if (this != NULL) {
+		pVenta = (eVenta*) this;
+		if (pVenta != NULL && venta_getCantidad(pVenta, &cantidadVendida)) {
+
+			if (cantidadVendida > 0) {
+				retorno = cantidadVendida;
+			}
+		}
+	}
+	return retorno;
+}
+static int buscarVentasMayoresADiezMil(void *this) {
+	eVenta *pVenta;
+	float precioUnitario;
+	int cantidad;
+	int precioTotal;
+	int retorno = 0;
+
+	if (this != NULL) {
+		pVenta = (eVenta*) this;
+		if (pVenta != NULL && venta_getPrecioUnitario(pVenta, &precioUnitario)
+				&& venta_getCantidad(pVenta, &cantidad)) {
+			precioTotal = precioUnitario * cantidad;
+			if (precioTotal > 10000) {
+				retorno = 1;
+			}
+		}
+	}
+	return retorno;
+}
+static int buscarVentasMayoresAVeinteMil(void *this) {
+	eVenta *pVenta;
+	float precioUnitario;
+	int cantidad;
+	int precioTotal;
+	int retorno = 0;
+
+	if (this != NULL) {
+		pVenta = (eVenta*) this;
+		if (pVenta != NULL && venta_getPrecioUnitario(pVenta, &precioUnitario)
+				&& venta_getCantidad(pVenta, &cantidad)) {
+			precioTotal = precioUnitario * cantidad;
+			if (precioTotal > 20000) {
+				retorno = 1;
+			}
+		}
+	}
+	return retorno;
+}
+static int buscarVentasPorModeloElegido(void *this) {
+	eVenta *pVenta;
+	char modeloElegido[30] = "Mentor";
+	char modelo[50];
+	int cantidad;
+	int retorno = 0;
+
+	if (this != NULL) {
+		pVenta = (eVenta*) this;
+		if (pVenta != NULL && venta_getModelo(pVenta, modelo)) {
+			if (strcmp(modeloElegido, modelo) == 0) {
+				if (venta_getCantidad(pVenta, &cantidad)) {
+					retorno = cantidad;
+				}
+			}
+		}
+	}
+	return retorno;
+}
+
+void generarInformeVentas(LinkedList *pListaVentas) {
+	int unidadesVendidasEnTotal = 0;
+	int cantidadMayoresADiezMil = 0;
+	int cantidadMayoresAVeinteMil = 0;
+	int cantidadDeModeloElegido = 0;
+	char modeloElegido[30] = "Mentor";
+
+	if (pListaVentas != NULL) {
+		unidadesVendidasEnTotal = ll_count(pListaVentas,
+				buscarCantidadesVendidas);
+		cantidadMayoresADiezMil = ll_count(pListaVentas,
+				buscarVentasMayoresADiezMil);
+		cantidadMayoresAVeinteMil = ll_count(pListaVentas,
+				buscarVentasMayoresAVeinteMil);
+		cantidadDeModeloElegido = ll_count(pListaVentas,
+				buscarVentasPorModeloElegido);
+
+		printf("******************\n");
+		printf("Informe de ventas\n");
+		printf("******************\n");
+		printf("- Cantidad de unidades vendidas en total: %d\n",
+				unidadesVendidasEnTotal); // cambiar el maximo de precio
+		printf("- Cantidad de ventas por un monto mayor a $10.000: %d\n",
+				cantidadMayoresADiezMil);
+		printf("- Cantidad de ventas por un monto mayor a $20.000: %d\n",
+				cantidadMayoresAVeinteMil);
+		printf("- Cantidad del modelo '%s' vendidos: %d\n", modeloElegido,
+				cantidadDeModeloElegido);
+		printf("******************\n");
+	}
 }
 

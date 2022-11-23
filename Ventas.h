@@ -52,5 +52,6 @@ int agregarVenta(LinkedList *pListaVentas);
 int eliminarVenta(LinkedList *pListaVentas);
 void modificarVenta(LinkedList *pListaVentas);
 void guardarArchivoSubmenu(LinkedList *pListaVentas);
+void generarInformeVentas(LinkedList *pListaVentas);
 
 #endif /* VENTAS_H_ */

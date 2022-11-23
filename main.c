@@ -4,7 +4,7 @@
 #include "LinkedList.h"
 #include "Controller.h"
 #include "Ventas.h"
-#define MENSAJE_MENU "Seleccione una opción:\n1. Alta de venta.\n2. Baja de venta.\n3. Modificación venta.\n4. Listar ventas.\n5. Guardar archivo.\n6. Generar informe de venta.\n7. Salir.\n"
+#define MENSAJE_MENU "Seleccione una opción:\n1. Alta de venta.\n2. Baja de venta.\n3. Modificación venta.\n4. Listar ventas.\n5. Guardar archivo.\n6. Generar informe de ventas.\n7. Salir.\n"
 
 int main(void) {
 	int mostrarMenu = 1;
@@ -46,7 +46,7 @@ int main(void) {
 				guardarArchivoSubmenu(listaVentas);
 				break;
 			case 6:
-				printf("Opción 6\n");
+				generarInformeVentas(listaVentas);
 				break;
 			case 7:
 				if (utn_obtenerNumero(&confirmacion,

@@ -28,6 +28,7 @@ int parserVentasDesdeTexto(FILE *pArchivo, LinkedList *pListVentas) {
 			if (lecturaCaracteres == 6) {
 				auxPunteroVenta = venta_newParametros(id, fecha, modelo,
 						cantidad, precioUnitario, tarjetaCredito);
+				// Utilizamos función de la biblioteca LinkedList para almacenar las ventas leídas del archivo
 				if (auxPunteroVenta != NULL
 						&& ll_add(pListVentas, auxPunteroVenta) == 0) {
 					retorno = 0;
