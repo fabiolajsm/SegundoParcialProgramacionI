@@ -267,13 +267,9 @@ int utn_obtenerFlotante(float *pResultado, char *mensaje, char *mensajeError,
 static int esFechaCorrecta(int dia, int mes, int anio) {
 	int ret = 0;
 
-	if (dia < 1) {
-		printf("Error, el día no puede ser menor a 1.\n");
-	} else if (mes > 12 || mes < 1) {
-		printf("Error, el mes no puede ser menor a 1 ni mayor a 12.\n");
-	} else if (anio < 1 && anio > 2022) {
+	if (dia < 1 || dia > 32 || mes > 12 || mes < 1 || anio < 1 || anio > 2022) {
 		printf(
-				"Error, el año no puede ser menor a 1 ni mayor al año actual (2022).\n");
+				"Error, tiene que ingresar sólo numeros, sin decimales. El día no puede ser menor a 1 o mayor a 32. El mes no puede ser menor a 1 ni mayor a 12. El año no puede ser menor a 1 ni mayor al año actual (2022).\n");
 	}
 
 	switch (mes) {

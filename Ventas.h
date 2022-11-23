@@ -1,13 +1,5 @@
-/*
- * Ventas.h
- *
- *  Created on: 21 nov. 2022
- *      Author: fsuarez
- */
-
 #ifndef VENTAS_H_
 #define VENTAS_H_
-#include "LinkedList.h"
 
 typedef struct {
 	int dia;
@@ -46,8 +38,5 @@ int venta_getPrecioUnitario(eVenta *this, float *pPrecio);
 
 int venta_setTarjetaCredito(eVenta *this, long int tarjetaCredito);
 int venta_getTarjetaCredito(eVenta *this, long int *pTarjetaCredito);
-
-int listarVentas(LinkedList *pListVentas);
-void guardarArchivoVentasSubmenu(LinkedList *pListaVentas);
 
 #endif /* VENTAS_H_ */

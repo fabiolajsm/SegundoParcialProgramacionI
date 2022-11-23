@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "LinkedList.h"
 #include "Parser.h"
 #include "Ventas.h"
 #include "utn.h"
 #define MODIFICACION_EXITOSA "Se modificó exitosamente\n"
 #define ERROR_MODIFICACION "Error. No se pudo modificar\n"
+#define ERROR_GUARDADO "No se pudo guardar el archivo\n"
 
 /** \brief Carga los datos de las ventas desde el archivo data.csv (modo texto).
  *
@@ -27,6 +27,50 @@ int controller_cargarVentasDesdeTexto(char *path, LinkedList *pListVentas) {
 		}
 		fclose(pArchivo);
 	}
+	return retorno;
+}
+
+/** \brief Guarda los datos de las ventas en el archivo data.csv (modo texto).
+ *
+ * \param path char*
+ * \param pListaVentas LinkedList*
+ * \return int
+ *
+ */
+int controller_guardarVentasFormatoTexto(char *path, LinkedList *pListaVentas) {
+	int retorno = -1;
+	FILE *pArchivo = NULL;
+
+	if (path != NULL && pListaVentas != NULL) {
+		pArchivo = fopen(path, "w");
+		if (pArchivo != NULL
+				&& parserGuardarVentasTexto(pArchivo, pListaVentas) == 0) {
+			retorno = 0;
+		}
+	}
+	fclose(pArchivo);
+
+	return retorno;
+}
+
+/** \brief Guarda los datos de las ventas en el archivo binario(data.bin)
+ *
+ * \param path char*
+ * \param pListaVentas LinkedList*
+ * \return int
+ *
+ */
+int controller_guardarVentasFormatoBinario(char *path, LinkedList *pListaVentas) {
+	int retorno = -1;
+	FILE *pArchivo = NULL;
+
+	if (path != NULL && pListaVentas != NULL) {
+		pArchivo = fopen(path, "wb");
+		if (parserGuardarVentasFormatoBinario(pArchivo, pListaVentas) == 0) {
+			retorno = 0;
+		}
+	}
+
 	return retorno;
 }
 
@@ -72,75 +116,6 @@ int controller_generarIDVenta(void) {
 	}
 
 	fclose(pArchivo);
-	return retorno;
-}
-
-/** \brief Guarda los datos de las ventas en el archivo data.csv (modo texto).
- *
- * \param path char*
- * \param pListaVentas LinkedList*
- * \return int
- *
- */
-int controller_guardarVentasFormatoTexto(char *path, LinkedList *pListaVentas) {
-	int retorno = -1;
-	FILE *pArchivo = NULL;
-	eVenta *auxPunteroVenta = NULL;
-
-	int id;
-	eFecha fecha;
-	char modelo[50];
-	int cantidad;
-	float precioUnitario;
-	long int tarjetaCredito;
-
-	pArchivo = fopen(path, "w");
-	if (path != NULL && pListaVentas != NULL && pArchivo != NULL) {
-		fprintf(pArchivo,
-				"ID_Venta,Fecha_Venta,Modelo_Auto,Cantidad,Precio_Unitario,Tarjeta_De_Credito\n");
-
-		for (int i = 0; i < ll_len(pListaVentas); i++) {
-			auxPunteroVenta = ll_get(pListaVentas, i);
-			if (venta_getId(auxPunteroVenta, &id)
-					&& venta_getFecha(auxPunteroVenta, &fecha)
-					&& venta_getModelo(auxPunteroVenta, modelo)
-					&& venta_getCantidad(auxPunteroVenta, &cantidad)
-					&& venta_getPrecioUnitario(auxPunteroVenta, &precioUnitario)
-					&& venta_getTarjetaCredito(auxPunteroVenta,
-							&tarjetaCredito)) {
-				fprintf(pArchivo, "%d,%d/%d/%d,%s,%d,%f,%ld\n", id, fecha.dia,
-						fecha.mes, fecha.anio, modelo, cantidad, precioUnitario,
-						tarjetaCredito);
-				retorno = 0;
-			}
-		}
-		fclose(pArchivo);
-	}
-	return retorno;
-}
-
-/** \brief Guarda los datos de las ventas en el archivo binario.
- *
- * \param path char*
- * \param pListaVentas LinkedList*
- * \return int
- *
- */
-int controller_guardarVentasFormatoBinario(char *path, LinkedList *pListaVentas) {
-	int retorno = -1;
-	FILE *pArchivo = NULL;
-	eVenta *auxPunteroVenta = NULL;
-	int largoLista = ll_len(pListaVentas);
-
-	pArchivo = fopen(path, "wb");
-	if (path != NULL && pListaVentas != NULL && pArchivo != NULL) {
-		for (int i = 0; i < largoLista; i++) {
-			auxPunteroVenta = ll_get(pListaVentas, i);
-			fwrite(auxPunteroVenta, sizeof(eVenta), 1, pArchivo);
-			retorno = 0;
-		}
-	}
-
 	return retorno;
 }
 
@@ -194,6 +169,50 @@ int controller_agregarVenta(LinkedList *pListaVentas) {
 	return retorno;
 }
 
+static void listarVenta(eVenta *item) {
+	int id;
+	eFecha fecha;
+	char modelo[50];
+	int cantidad;
+	float precioUnitario;
+	long int tarjetaCredito;
+
+	if (item != NULL && venta_getId(item, &id) == 1
+			&& venta_getFecha(item, &fecha) == 1
+			&& venta_getModelo(item, modelo) == 1
+			&& venta_getCantidad(item, &cantidad) == 1
+			&& venta_getPrecioUnitario(item, &precioUnitario) == 1
+			&& venta_getTarjetaCredito(item, &tarjetaCredito) == 1) {
+		printf("| %*d | %*s | %*d    |      %*.2f |  %ld  | %d/%d/%d \n", -3,
+				id, -22, modelo, 5, cantidad, -10, precioUnitario,
+				tarjetaCredito, fecha.dia, fecha.mes, fecha.anio);
+	}
+}
+
+int listarVentas(LinkedList *pListVentas) {
+	int retorno = -1;
+	int largo = ll_len(pListVentas);
+
+	if (pListVentas != NULL && largo > 0) {
+		printf("\t\t\t\t- Listado de ventas -\n");
+		printf(
+				"===============================================================================================\n");
+		printf("|%*s|%*s|%s|%*s|%*s|%*s|\n", -5, " ID", -24, "        Modelo",
+				" Cantidad ", -13, " Precio Unitario ", -20,
+				" Tarjeta de credito ", -13, " Fecha ");
+		printf(
+				"-----------------------------------------------------------------------------------------------\n");
+		for (int i = 0; i < largo; i++) {
+			listarVenta((eVenta*) ll_get(pListVentas, i));
+		}
+		printf(
+				"===============================================================================================\n");
+		retorno = 0;
+	}
+
+	return retorno;
+}
+
 static int obtenerIndexPorId(LinkedList *pListaVentas, int idVenta) {
 	int retorno = -1;
 	int idObtenido;
@@ -223,6 +242,7 @@ int controller_eliminarVenta(LinkedList *pListaVentas) {
 	int indexVenta;
 	int idIngresado;
 	int idVenta;
+	int confirmacion;
 	eVenta *pVentaARemover = NULL;
 
 	if (pListaVentas != NULL && listarVentas(pListaVentas) == 0) {
@@ -236,8 +256,15 @@ int controller_eliminarVenta(LinkedList *pListaVentas) {
 			if (pVentaARemover != NULL
 					&& venta_getId(pVentaARemover, &idVenta)) {
 				if (idVenta == idIngresado) {
-					if (ll_remove(pListaVentas, indexVenta) == 0) {
-						retorno = 0;
+					if (utn_obtenerNumero(&confirmacion,
+							"Seguro desea dar de baja a esta venta?\n1. Si.\n2. No.\n",
+							"Error. Opción inválida, tiene que elegir un número del 1 al 2.\n",
+							1, 2) == 0) {
+						if (confirmacion == 1) {
+							if (ll_remove(pListaVentas, indexVenta) == 0) {
+								retorno = 0;
+							}
+						}
 					}
 				}
 			} else {
@@ -254,7 +281,8 @@ int controller_eliminarVenta(LinkedList *pListaVentas) {
  * \return void
  *
  */
-void controller_modificarVenta(LinkedList *pListaVentas) {
+int controller_modificarVenta(LinkedList *pListaVentas) {
+	int retorno = -1;
 	int opcion;
 	int esOpcionValida;
 	int mostrarSubmenu = 1;
@@ -293,9 +321,11 @@ void controller_modificarVenta(LinkedList *pListaVentas) {
 									50) == 0) {
 								if (venta_setModelo(pVentaAModificar,
 										modeloAuto)) {
+									retorno = 0;
 									printf(MODIFICACION_EXITOSA);
 								}
 							} else {
+								retorno = -1;
 								printf(ERROR_MODIFICACION);
 							}
 							break;
@@ -305,8 +335,10 @@ void controller_modificarVenta(LinkedList *pListaVentas) {
 									== 0) {
 								if (venta_setFecha(pVentaAModificar, fecha)) {
 									printf(MODIFICACION_EXITOSA);
+									retorno = 0;
 								}
 							} else {
+								retorno = -1;
 								printf(ERROR_MODIFICACION);
 							}
 							break;
@@ -317,9 +349,11 @@ void controller_modificarVenta(LinkedList *pListaVentas) {
 									1, 100) == 0) {
 								if (venta_setCantidad(pVentaAModificar,
 										cantidad)) {
+									retorno = 0;
 									printf(MODIFICACION_EXITOSA);
 								}
 							} else {
+								retorno = -1;
 								printf(ERROR_MODIFICACION);
 							}
 							break;
@@ -330,9 +364,11 @@ void controller_modificarVenta(LinkedList *pListaVentas) {
 									1, 100) == 0) {
 								if (venta_setPrecioUnitario(pVentaAModificar,
 										precioUnitario)) {
+									retorno = 0;
 									printf(MODIFICACION_EXITOSA);
 								}
 							} else {
+								retorno = -1;
 								printf(ERROR_MODIFICACION);
 							}
 							break;
@@ -343,13 +379,16 @@ void controller_modificarVenta(LinkedList *pListaVentas) {
 									== 0) {
 								if (venta_setTarjetaCredito(pVentaAModificar,
 										tarjetaCredito)) {
+									retorno = 0;
 									printf(MODIFICACION_EXITOSA);
 								}
 							} else {
+								retorno = -1;
 								printf(ERROR_MODIFICACION);
 							}
 							break;
 						case 6:
+							retorno = 0;
 							mostrarSubmenu = 0;
 							break;
 						}
@@ -360,88 +399,48 @@ void controller_modificarVenta(LinkedList *pListaVentas) {
 			}
 		}
 	}
-}
-
-// Funciones criterio
-static int buscarCantidadesVendidas(void *this) {
-	eVenta *pVenta;
-	int cantidadVendida;
-	int retorno = 0;
-
-	if (this != NULL) {
-		pVenta = (eVenta*) this;
-		if (pVenta != NULL && venta_getCantidad(pVenta, &cantidadVendida)) {
-
-			if (cantidadVendida > 0) {
-				retorno = cantidadVendida;
-			}
-		}
-	}
 	return retorno;
 }
-static int buscarVentasMayoresADiezMil(void *this) {
-	eVenta *pVenta;
-	float precioUnitario;
-	int cantidad;
-	int precioTotal;
-	int retorno = 0;
 
-	if (this != NULL) {
-		pVenta = (eVenta*) this;
-		if (pVenta != NULL && venta_getPrecioUnitario(pVenta, &precioUnitario)
-				&& venta_getCantidad(pVenta, &cantidad)) {
-			precioTotal = precioUnitario * cantidad;
-			if (precioTotal > 10000) {
-				retorno = 1;
-			}
-		}
-	}
-	return retorno;
-}
-static int buscarVentasMayoresAVeinteMil(void *this) {
-	eVenta *pVenta;
-	float precioUnitario;
-	int cantidad;
-	int precioTotal;
-	int retorno = 0;
+int guardarArchivoVentasSubmenu(LinkedList *pListaVentas) {
+	int retorno = -1;
+	int mostrarSubmenu = 1;
+	int opcion;
 
-	if (this != NULL) {
-		pVenta = (eVenta*) this;
-		if (pVenta != NULL && venta_getPrecioUnitario(pVenta, &precioUnitario)
-				&& venta_getCantidad(pVenta, &cantidad)) {
-			precioTotal = precioUnitario * cantidad;
-			if (precioTotal > 20000) {
-				retorno = 1;
-			}
-		}
-	}
-	return retorno;
-}
-static int buscarVentasPorModeloElegido(void *this) {
-	eVenta *pVenta;
-	char modeloElegido[30] = "Mentor";
-	char modelo[50];
-	int cantidad;
-	int retorno = 0;
-
-	if (this != NULL) {
-		pVenta = (eVenta*) this;
-		if (pVenta != NULL && venta_getModelo(pVenta, modelo)) {
-			if (strcmp(modeloElegido, modelo) == 0) {
-				if (venta_getCantidad(pVenta, &cantidad)) {
-					retorno = cantidad;
+	if (pListaVentas != NULL) {
+		while (mostrarSubmenu) {
+			if (utn_obtenerNumero(&opcion,
+					"Seleccione como prefiere guardar el archivo:\n1. Formato texto.\n2. Formato binario.\n3. Salir.\n",
+					"Error. Opción inválida.\n", 1, 3) == 0) {
+				switch (opcion) {
+				case 1:
+					if (controller_guardarVentasFormatoTexto("data.csv",
+							pListaVentas) == 0) {
+						retorno = 0;
+						printf("Exitosamente guardado como formato de texto\n");
+					} else {
+						retorno = -1;
+						printf(ERROR_GUARDADO);
+					}
+					break;
+				case 2:
+					if (controller_guardarVentasFormatoBinario("data.bin",
+							pListaVentas) == 0) {
+						retorno = 0;
+						printf("Exitosamente guardado como formato binario\n");
+					} else {
+						retorno = -1;
+						printf(ERROR_GUARDADO);
+					}
+					break;
+				case 3:
+					retorno = 0;
+					printf("Submenú cerrado\n");
+					mostrarSubmenu = 0;
+					break;
 				}
 			}
 		}
-	}
-	return retorno;
-}
-
-static int convertirNumeroAString(char *pString, int numero) {
-	int retorno = -1;
-	if (pString != NULL) {
-		sprintf(pString, "%d", numero);
-		retorno = 0;
 	}
 	return retorno;
 }
@@ -451,60 +450,9 @@ int controller_generarInformeVentasFormatoTexto(char *path,
 	int retorno = -1;
 	FILE *pArchivo = NULL;
 
-	// Unidades vendidas en total
-	char textoUnidadesVendidas[] = "- Cantidad de unidades vendidas en total: ";
-	char textoUnidadesVendidasEnTotal[10];
-	int unidadesVendidasEnTotal = 0;
-	// Cantidad de ventas por un monto mayor a diez mil
-	char textoMayoresADiezMil[] =
-			"\n- Cantidad de ventas por un monto mayor a $10.000: ";
-	char textoTotalMayoresADiezMil[10];
-	int cantidadMayoresADiezMil = 0;
-	// Cantidad de ventas por un monto mayor a veinte mil
-	char textoMayoresAVeinteMil[] =
-			"\n- Cantidad de ventas por un monto mayor a $20.000: ";
-	char textoTotalMayoresAVeinteMil[10];
-	int cantidadMayoresAVeinteMil = 0;
-	// Cantidad de ventas por modelo elegido
-	char textoCantidadPorModelo[] =
-			"\n- Cantidad del modelo 'Mentor' vendidos: ";
-	char textoCantidadPorModeloTotal[10];
-	int cantidadDeModeloElegido = 0;
-
-	pArchivo = fopen(path, "wt");
-	if (path != NULL && pListaVentas != NULL && pArchivo != NULL) {
-		unidadesVendidasEnTotal = ll_count(pListaVentas,
-				buscarCantidadesVendidas);
-		cantidadMayoresADiezMil = ll_count(pListaVentas,
-				buscarVentasMayoresADiezMil);
-		cantidadMayoresAVeinteMil = ll_count(pListaVentas,
-				buscarVentasMayoresAVeinteMil);
-		cantidadDeModeloElegido = ll_count(pListaVentas,
-				buscarVentasPorModeloElegido);
-
-		// Convertimos a los datos a string
-		if (convertirNumeroAString(textoUnidadesVendidasEnTotal,
-				unidadesVendidasEnTotal) == 0
-				&& convertirNumeroAString(textoTotalMayoresADiezMil,
-						cantidadMayoresADiezMil) == 0
-				&& convertirNumeroAString(textoTotalMayoresAVeinteMil,
-						cantidadMayoresAVeinteMil) == 0
-				&& convertirNumeroAString(textoCantidadPorModeloTotal,
-						cantidadDeModeloElegido) == 0) {
-			// Concatenamos los textos con su valor
-			strcat(textoUnidadesVendidas, textoUnidadesVendidasEnTotal);
-			strcat(textoMayoresADiezMil, textoTotalMayoresADiezMil);
-			strcat(textoMayoresAVeinteMil, textoTotalMayoresAVeinteMil);
-			strcat(textoCantidadPorModelo, textoCantidadPorModeloTotal);
-			// Escribimos en el archivo
-			fputs("******************\n", pArchivo);
-			fputs("Informe de ventas\n", pArchivo);
-			fputs("******************\n", pArchivo);
-			fputs(textoUnidadesVendidas, pArchivo);
-			fputs(textoMayoresADiezMil, pArchivo);
-			fputs(textoMayoresAVeinteMil, pArchivo);
-			fputs(textoCantidadPorModelo, pArchivo);
-			fputs("\n******************", pArchivo);
+	if (path != NULL && pListaVentas != NULL) {
+		pArchivo = fopen(path, "wt");
+		if (parserGenerarInformeVentasTexto(pArchivo, pListaVentas) == 0) {
 			retorno = 0;
 		}
 	}

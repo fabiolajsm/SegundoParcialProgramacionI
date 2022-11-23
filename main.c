@@ -10,6 +10,7 @@ int main(void) {
 	int mostrarMenu = 1;
 	int opcion;
 	int confirmacion;
+	int seHicieronCambios = 0;
 	LinkedList *listaVentas = ll_newLinkedList();
 
 	if (controller_cargarVentasDesdeTexto("data.csv", listaVentas) == -1) {
@@ -23,19 +24,23 @@ int main(void) {
 			case 1:
 				if (controller_agregarVenta(listaVentas) == 0) {
 					printf("Se dio de alta la venta exitosamente\n");
+					seHicieronCambios = 1;
 				} else {
 					printf("Error. No se pudo dar de alta la venta\n");
 				}
 				break;
 			case 2:
 				if (controller_eliminarVenta(listaVentas) == 0) {
+					seHicieronCambios = 1;
 					printf("Se eliminó la venta exitosamente\n");
 				} else {
-					printf("No se pudo eliminar la venta\n");
+					printf("No se eliminó ninguna venta\n");
 				}
 				break;
 			case 3:
-				controller_modificarVenta(listaVentas);
+				if (controller_modificarVenta(listaVentas) == 0) {
+					seHicieronCambios = 1;
+				}
 				break;
 			case 4:
 				if (listarVentas(listaVentas) == -1) {
@@ -43,7 +48,9 @@ int main(void) {
 				}
 				break;
 			case 5:
-				guardarArchivoVentasSubmenu(listaVentas);
+				if (guardarArchivoVentasSubmenu(listaVentas) == 0) {
+					seHicieronCambios = 0;
+				}
 				break;
 			case 6:
 				if (controller_generarInformeVentasFormatoTexto("informes.txt",
@@ -54,12 +61,17 @@ int main(void) {
 				}
 				break;
 			case 7:
-				if (utn_obtenerNumero(&confirmacion,
-						"Seguro desea salir?\n1. Si.\n2. No.\n",
-						"Error. Opción inválida, tiene que elegir un número del 1 al 2.\n",
-						1, 2) == 0 && confirmacion == 1) {
-					printf("Hasta luego;)\n");
+				if (seHicieronCambios) {
+					if (utn_obtenerNumero(&confirmacion,
+							"Seguro desea salir sin guardar los cambios?\n1. Si.\n2. No.\n",
+							"Error. Opción inválida, tiene que elegir un número del 1 al 2.\n",
+							1, 2) == 0 && confirmacion == 1) {
+						printf("Hasta luego;)\n");
+						mostrarMenu = 0;
+					}
+				} else {
 					mostrarMenu = 0;
+					printf("Menu cerrado, no se realizaron nuevos cambios\n");
 				}
 				break;
 			}

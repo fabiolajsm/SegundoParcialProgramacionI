@@ -1,11 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "LinkedList.h"
 #include "utn.h"
 #include "Ventas.h"
-#include "Controller.h"
-#define ERROR_GUARDADO "No se pudo guardar el archivo\n"
 
 eVenta* venta_new(void) {
 	eVenta *aux = NULL;
@@ -174,84 +171,4 @@ int venta_getTarjetaCredito(eVenta *this, long int *pTarjetaCredito) {
 		retorno = 1;
 	}
 	return retorno;
-}
-
-static void listarVenta(eVenta *item) {
-	int id;
-	eFecha fecha;
-	char modelo[50];
-	int cantidad;
-	float precioUnitario;
-	long int tarjetaCredito;
-
-	if (item != NULL && venta_getId(item, &id) == 1
-			&& venta_getFecha(item, &fecha) == 1
-			&& venta_getModelo(item, modelo) == 1
-			&& venta_getCantidad(item, &cantidad) == 1
-			&& venta_getPrecioUnitario(item, &precioUnitario) == 1
-			&& venta_getTarjetaCredito(item, &tarjetaCredito) == 1) {
-		printf("| %*d | %*s | %*d    |      %*.2f |  %ld  | %d/%d/%d \n", -3,
-				id, -22, modelo, 5, cantidad, -10, precioUnitario,
-				tarjetaCredito, fecha.dia, fecha.mes, fecha.anio);
-	}
-}
-
-int listarVentas(LinkedList *pListVentas) {
-	int retorno = -1;
-	int largo = ll_len(pListVentas);
-
-	if (pListVentas != NULL && largo > 0) {
-		printf("\t\t\t\t- Listado de ventas -\n");
-		printf(
-				"===============================================================================================\n");
-		printf("|%*s|%*s|%s|%*s|%*s|%*s|\n", -5, " ID", -24, "        Modelo",
-				" Cantidad ", -13, " Precio Unitario ", -20,
-				" Tarjeta de credito ", -13, " Fecha ");
-		printf(
-				"-----------------------------------------------------------------------------------------------\n");
-		for (int i = 0; i < largo; i++) {
-			listarVenta((eVenta*) ll_get(pListVentas, i));
-		}
-		printf(
-				"===============================================================================================\n");
-		retorno = 0;
-	}
-
-	return retorno;
-}
-
-void guardarArchivoVentasSubmenu(LinkedList *pListaVentas) {
-	int mostrarSubmenu = 1;
-	int opcion;
-
-	if (pListaVentas != NULL) {
-		while (mostrarSubmenu) {
-			if (utn_obtenerNumero(&opcion,
-					"Seleccione como prefiere guardar el archivo:\n1. Formato texto.\n2. Formato binario.\n3. Salir.\n",
-					"Error. Opción inválida.\n", 1, 3) == 0) {
-				switch (opcion) {
-				case 1:
-					if (controller_guardarVentasFormatoTexto("data.csv",
-							pListaVentas) == 0) {
-						printf("Exitosamente guardado como formato de texto\n");
-					} else {
-						printf(ERROR_GUARDADO);
-					}
-					break;
-				case 2:
-					if (controller_guardarVentasFormatoBinario("data.bin",
-							pListaVentas) == 0) {
-						printf("Exitosamente guardado como formato binario\n");
-					} else {
-						printf(ERROR_GUARDADO);
-					}
-					break;
-				case 3:
-					printf("Submenú cerrado\n");
-					mostrarSubmenu = 0;
-					break;
-				}
-			}
-		}
-	}
 }
