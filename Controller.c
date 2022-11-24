@@ -245,6 +245,11 @@ int controller_eliminarVenta(LinkedList *pListaVentas) {
 	int confirmacion;
 	eVenta *pVentaARemover = NULL;
 
+	if (ll_len(pListaVentas) < 1) {
+		printf("No existen ventas\n");
+		return -1;
+	}
+
 	if (pListaVentas != NULL && listarVentas(pListaVentas) == 0) {
 		if (utn_obtenerNumero(&idIngresado,
 				"Ingrese el ID de la venta que quiere eliminar:\n",
@@ -296,6 +301,11 @@ int controller_modificarVenta(LinkedList *pListaVentas) {
 
 	int indexVenta;
 	eVenta *pVentaAModificar = NULL;
+
+	if (ll_len(pListaVentas) < 1) {
+		printf("No existen ventas\n");
+		return -1;
+	}
 
 	if (pListaVentas != NULL && listarVentas(pListaVentas) == 0) {
 		if (utn_obtenerNumero(&idVenta,
@@ -407,6 +417,11 @@ int guardarArchivoVentasSubmenu(LinkedList *pListaVentas) {
 	int mostrarSubmenu = 1;
 	int opcion;
 
+	if (ll_len(pListaVentas) < 1) {
+		printf("No existen ventas\n");
+		return -1;
+	}
+
 	if (pListaVentas != NULL) {
 		while (mostrarSubmenu) {
 			if (utn_obtenerNumero(&opcion,
@@ -449,6 +464,11 @@ int controller_generarInformeVentasFormatoTexto(char *path,
 		LinkedList *pListaVentas) {
 	int retorno = -1;
 	FILE *pArchivo = NULL;
+
+	if (ll_len(pListaVentas) < 1) {
+		printf("No existen ventas\n");
+		return -1;
+	}
 
 	if (path != NULL && pListaVentas != NULL) {
 		pArchivo = fopen(path, "wt");

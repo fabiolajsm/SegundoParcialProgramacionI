@@ -44,7 +44,7 @@ int main(void) {
 				break;
 			case 4:
 				if (listarVentas(listaVentas) == -1) {
-					printf("No se pudieron listar las ventas\n");
+					printf("No existen ventas\n");
 				}
 				break;
 			case 5:
